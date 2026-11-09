@@ -62,4 +62,4 @@ The app listens on `http://127.0.0.1:8000`. To use another port, set `ROCKET_POR
 ## Known limits
 
 - A duplicate email on create or edit returns a server error, not a field message. The form checks the format of the email, not whether it is taken.
-- The Diesel in `vendor/diesel` is a patched copy of Diesel 2.3.14 for libmariadb 3.4, as in `Ignite/vendor/diesel/PATCH.md`. Remove it, and the `[patch.crates-io]` entry in `Cargo.toml`, once a Diesel release has the fix.
+- Diesel is pinned to a fork at `a07c4b2c` in `Cargo.toml`, with the libmariadb 3.4 fix. Remove that pin when a Diesel release contains the fix.
