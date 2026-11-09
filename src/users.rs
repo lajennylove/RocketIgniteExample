@@ -11,7 +11,7 @@ use diesel::result::QueryResult;
 use diesel::sql_types::Bool;
 use ignite_core::{
     escape_like, Column, Direction, Field, FieldErrors, FieldKind, FormInput, IgniteResource,
-    ListQuery, Page, StatWidget,
+    LatestRecords, ListQuery, Page, StatWidget,
 };
 use ignite_panel::users::users;
 use serde::Serialize;
@@ -89,6 +89,22 @@ impl IgniteResource for Users {
 
     const SLUG: &'static str = "users";
     const TITLE: &'static str = "Users";
+
+    fn latest_records() -> Option<LatestRecords> {
+        Some(LatestRecords {
+            title: "Latest users",
+            columns: &["name", "email", "created_at"],
+            limit: 5,
+        })
+    }
+
+    fn latest(conn: &mut MysqlConnection, limit: i64) -> QueryResult<Vec<UserRecord>> {
+        users::table
+            .order(users::id.desc())
+            .limit(limit)
+            .select(UserRecord::as_select())
+            .load(conn)
+    }
 
     fn widgets(conn: &mut MysqlConnection) -> QueryResult<Vec<StatWidget>> {
         let total: i64 = users::table.count().get_result(conn)?;
