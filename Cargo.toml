@@ -3,10 +3,22 @@ name = "rocket-ignite-example"
 version = "0.0.0"
 edition = "2021"
 publish = false
+default-run = "rocket-ignite-example"
 
 [dependencies]
+ignite-panel = { git = "https://github.com/lajennylove/Ignite", rev = "36078bae992bec246916920898f529c34bfb6568" }
+ignite-core = { git = "https://github.com/lajennylove/Ignite", rev = "36078bae992bec246916920898f529c34bfb6568" }
 rocket = { git = "https://github.com/rwf2/Rocket", rev = "3a54d079" }
 propel_rocket = { git = "https://github.com/lajennylove/propel", rev = "18530480ee3328845b0abeaf35d0f8397f50634d" }
+diesel = { version = "2", features = ["mysql", "r2d2", "chrono"] }
+chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
+dotenvy = "0.15"
+
+# Diesel 2.3.14 with the libmariadb 3.4 fix. Copied from Ignite/vendor/diesel
+# (see vendor/diesel/PATCH.md). Cargo ignores patches in dependencies, so the
+# app must carry this line itself.
+[patch.crates-io]
+diesel = { path = "vendor/diesel" }
 
 [workspace]
