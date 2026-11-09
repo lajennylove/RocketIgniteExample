@@ -6,8 +6,8 @@ publish = false
 default-run = "rocket-ignite-example"
 
 [dependencies]
-ignite-panel = { git = "https://github.com/lajennylove/Ignite", rev = "dc0309470d3f1426a1d5cfaca20fffa288cabd51" }
-ignite-core = { git = "https://github.com/lajennylove/Ignite", rev = "dc0309470d3f1426a1d5cfaca20fffa288cabd51" }
+ignite-panel = { git = "https://github.com/lajennylove/Ignite", rev = "4898b969617db02d3c7360b7c56cfa693a05aa03" }
+ignite-core = { git = "https://github.com/lajennylove/Ignite", rev = "4898b969617db02d3c7360b7c56cfa693a05aa03" }
 rocket = { git = "https://github.com/rwf2/Rocket", rev = "3a54d079" }
 propel_rocket = { git = "https://github.com/lajennylove/propel", rev = "e0fb10893095a4b66996d35efb45cf0dd466ccdd" }
 propel_runtime = { git = "https://github.com/lajennylove/propel", rev = "e0fb10893095a4b66996d35efb45cf0dd466ccdd" }

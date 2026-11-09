@@ -6,7 +6,7 @@ mod users;
 
 use diesel::mysql::MysqlConnection;
 use diesel::Connection;
-use ignite_panel::Ignite;
+use ignite_panel::{Ignite, PanelStyles};
 use propel_rocket::PropelView;
 use propel_runtime::{Assets, RenderError};
 use serde::Serialize;
@@ -19,6 +19,7 @@ mod compiled {
 #[derive(Serialize)]
 pub(crate) struct Home {
     title: &'static str,
+    ignite_styles: String,
 }
 
 /// Renders a page. A debug build uses the dev renderer, which reads the views on
@@ -43,11 +44,12 @@ where
 }
 
 #[get("/")]
-fn index() -> PropelView {
+fn index(styles: PanelStyles) -> PropelView {
     page(
         "home",
         &Home {
             title: "Ignite example",
+            ignite_styles: styles.html().to_string(),
         },
         compiled::home::render,
     )
