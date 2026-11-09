@@ -21,36 +21,27 @@ pub(crate) struct Home {
     title: &'static str,
 }
 
-/// The app's assets: its own `public` directory, and the panel's build as the `ui`
-/// namespace. The panel's layout loads its stylesheet and script from `ui`, so every
-/// view that extends the layout is styled, with no step in the view itself.
-pub(crate) fn app_assets() -> Assets {
-    Assets::new("public").namespace("ui", ignite_panel::panel_source("/admin"))
-}
-
 /// Renders a page. A debug build uses the dev renderer, which reads the views on
 /// each request, so an edit shows on refresh. A release build renders the views
-/// compiled by `build.rs`, the only path a release build has.
+/// compiled by `build.rs`, with the registered assets. The panel registers its own
+/// assets, so the app adds no line for its styling.
 #[cfg(debug_assertions)]
 pub(crate) fn page<C, F>(name: &str, context: &C, _compiled: F) -> PropelView
 where
     C: Serialize,
     F: FnOnce(&C, &Assets) -> Result<String, RenderError>,
 {
-    use propel_runtime::{render_with_assets, FileLoader};
-    // The app's views, and the panel's embedded views as `ignite`.
-    let loader =
-        FileLoader::new("resources/views").namespace_loader("ignite", ignite_panel::EmbeddedViews);
-    PropelView::from_result(render_with_assets(&loader, &app_assets(), name, context))
+    PropelView::render(name, context)
 }
 
 /// See the debug version. A release build renders the compiled view.
 #[cfg(not(debug_assertions))]
 pub(crate) fn page<C, F>(_name: &str, context: &C, compiled: F) -> PropelView
 where
+    C: Serialize,
     F: FnOnce(&C, &Assets) -> Result<String, RenderError>,
 {
-    PropelView::from_result(compiled(context, &app_assets()))
+    PropelView::compiled(|assets| compiled(context, assets))
 }
 
 #[get("/")]

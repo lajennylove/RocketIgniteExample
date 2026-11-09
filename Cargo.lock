@@ -977,7 +977,7 @@ dependencies = [
 [[package]]
 name = "ignite-core"
 version = "0.0.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=39ea29313731788c83e97ff942e532243428eee1#39ea29313731788c83e97ff942e532243428eee1"
+source = "git+https://github.com/lajennylove/Ignite?rev=265cb1df1bccc7d8a343b5fa300027e28b8d011d#265cb1df1bccc7d8a343b5fa300027e28b8d011d"
 dependencies = [
  "argon2",
  "diesel",
@@ -989,7 +989,7 @@ dependencies = [
 [[package]]
 name = "ignite-macros"
 version = "0.0.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=39ea29313731788c83e97ff942e532243428eee1#39ea29313731788c83e97ff942e532243428eee1"
+source = "git+https://github.com/lajennylove/Ignite?rev=265cb1df1bccc7d8a343b5fa300027e28b8d011d#265cb1df1bccc7d8a343b5fa300027e28b8d011d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -999,7 +999,7 @@ dependencies = [
 [[package]]
 name = "ignite-panel"
 version = "0.0.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=39ea29313731788c83e97ff942e532243428eee1#39ea29313731788c83e97ff942e532243428eee1"
+source = "git+https://github.com/lajennylove/Ignite?rev=265cb1df1bccc7d8a343b5fa300027e28b8d011d#265cb1df1bccc7d8a343b5fa300027e28b8d011d"
 dependencies = [
  "argon2",
  "base64",
@@ -1509,7 +1509,7 @@ dependencies = [
 [[package]]
 name = "propel_compiler"
 version = "0.1.0"
-source = "git+https://github.com/lajennylove/propel?rev=5c2884f52b2d38eae63fb8eda088b81f19f547fe#5c2884f52b2d38eae63fb8eda088b81f19f547fe"
+source = "git+https://github.com/lajennylove/propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
 dependencies = [
  "propel_parser",
  "propel_runtime",
@@ -1518,7 +1518,7 @@ dependencies = [
 [[package]]
 name = "propel_parser"
 version = "0.1.0"
-source = "git+https://github.com/lajennylove/propel?rev=5c2884f52b2d38eae63fb8eda088b81f19f547fe#5c2884f52b2d38eae63fb8eda088b81f19f547fe"
+source = "git+https://github.com/lajennylove/propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
 dependencies = [
  "pest",
  "pest_derive",
@@ -1527,7 +1527,7 @@ dependencies = [
 [[package]]
 name = "propel_rocket"
 version = "0.1.0"
-source = "git+https://github.com/lajennylove/propel?rev=5c2884f52b2d38eae63fb8eda088b81f19f547fe#5c2884f52b2d38eae63fb8eda088b81f19f547fe"
+source = "git+https://github.com/lajennylove/propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
 dependencies = [
  "propel_runtime",
  "rocket",
@@ -1537,7 +1537,7 @@ dependencies = [
 [[package]]
 name = "propel_runtime"
 version = "0.1.0"
-source = "git+https://github.com/lajennylove/propel?rev=5c2884f52b2d38eae63fb8eda088b81f19f547fe#5c2884f52b2d38eae63fb8eda088b81f19f547fe"
+source = "git+https://github.com/lajennylove/propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
 dependencies = [
  "propel_parser",
  "serde",

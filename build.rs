@@ -9,6 +9,8 @@ fn main() {
 
     propel_compiler::build::Views::new("resources/views")
         .namespace("ignite", panel_views)
+        // The panel's layout loads its assets from `ui::`, and it is compiled into these
+        // views, so the namespace is declared here. The panel registers it at run time.
         .asset_namespace("ui")
         .view("home", "crate::Home")
         .view("subscribe", "crate::subscribe::Subscribe")
