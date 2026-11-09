@@ -4,7 +4,7 @@ A Rocket app that mounts the [Ignite](https://github.com/lajennylove/Ignite) adm
 
 ## Setup
 
-You need Rust (stable), and MariaDB or MySQL. The app is built and run in debug mode. Release builds wait on a Propel compile error (see Propel's `docs/production.md`).
+You need Rust (stable), and MariaDB or MySQL. Debug and release builds both work. A release build renders the views compiled by `build.rs`, and a debug build reads them at run time, so an edit shows on refresh.
 
 1. Create the database and a user that can reach it. With MariaDB on this machine, the socket login needs no password:
 
@@ -48,6 +48,10 @@ cargo run
 ```
 
 The app listens on `http://127.0.0.1:8000`. To use another port, set `ROCKET_PORT`, for example `ROCKET_PORT=8123 cargo run`.
+
+## The sign-up form
+
+`/subscribe` is the app's own form. Its POST route takes `CsrfForm` from Ignite, so a request without the page's `_token` is refused with status 419. The page writes the token into the form from the context, which the route fills with `CsrfToken`.
 
 ## The app's own view
 
