@@ -1509,7 +1509,7 @@ dependencies = [
 [[package]]
 name = "propel_compiler"
 version = "0.1.0"
-source = "git+https://github.com/lajennylove/propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
+source = "git+https://github.com/lajennylove/Propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
 dependencies = [
  "propel_parser",
  "propel_runtime",
@@ -1518,7 +1518,7 @@ dependencies = [
 [[package]]
 name = "propel_parser"
 version = "0.1.0"
-source = "git+https://github.com/lajennylove/propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
+source = "git+https://github.com/lajennylove/Propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
 dependencies = [
  "pest",
  "pest_derive",
@@ -1527,7 +1527,7 @@ dependencies = [
 [[package]]
 name = "propel_rocket"
 version = "0.1.0"
-source = "git+https://github.com/lajennylove/propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
+source = "git+https://github.com/lajennylove/Propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
 dependencies = [
  "propel_runtime",
  "rocket",
@@ -1537,7 +1537,7 @@ dependencies = [
 [[package]]
 name = "propel_runtime"
 version = "0.1.0"
-source = "git+https://github.com/lajennylove/propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
+source = "git+https://github.com/lajennylove/Propel?rev=71ecd1c0c9676db74ce0c90ea3578a12fc043f21#71ecd1c0c9676db74ce0c90ea3578a12fc043f21"
 dependencies = [
  "propel_parser",
  "serde",
