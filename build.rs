@@ -9,6 +9,7 @@ fn main() {
 
     propel_compiler::build::Views::new("resources/views")
         .namespace("ignite", panel_views)
+        .asset_namespace("ui")
         .view("home", "crate::Home")
         .view("subscribe", "crate::subscribe::Subscribe")
         .build();

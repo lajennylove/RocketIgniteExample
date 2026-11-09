@@ -1,7 +1,7 @@
 //! A newsletter sign-up: the app's own form. Its POST route takes `CsrfForm`, so a
 //! request without the page's token is refused with 419.
 
-use ignite_panel::{CsrfForm, CsrfToken, PanelStyles};
+use ignite_panel::{CsrfForm, CsrfToken};
 use propel_rocket::PropelView;
 use rocket::get;
 use rocket::http::Status;
@@ -17,7 +17,6 @@ use crate::compiled;
 pub(crate) struct Subscribe {
     pub(crate) title: &'static str,
     pub(crate) csrf_token: String,
-    pub(crate) ignite_styles: String,
     pub(crate) thanked: bool,
     pub(crate) has_error: bool,
     pub(crate) error: String,
@@ -26,11 +25,10 @@ pub(crate) struct Subscribe {
 }
 
 impl Subscribe {
-    fn blank(token: &CsrfToken, styles: &PanelStyles) -> Self {
+    fn blank(token: &CsrfToken) -> Self {
         Subscribe {
             title: "Newsletter",
             csrf_token: token.value().to_string(),
-            ignite_styles: styles.html().to_string(),
             thanked: false,
             has_error: false,
             error: String::new(),
@@ -41,17 +39,13 @@ impl Subscribe {
 }
 
 #[get("/subscribe")]
-pub(crate) fn form(token: CsrfToken, styles: PanelStyles) -> PropelView {
-    let context = Subscribe::blank(&token, &styles);
+pub(crate) fn form(token: CsrfToken) -> PropelView {
+    let context = Subscribe::blank(&token);
     page("subscribe", &context, compiled::subscribe::render)
 }
 
 #[post("/subscribe", data = "<form>")]
-pub(crate) fn submit(
-    form: CsrfForm,
-    token: CsrfToken,
-    styles: PanelStyles,
-) -> (Status, PropelView) {
+pub(crate) fn submit(form: CsrfForm, token: CsrfToken) -> (Status, PropelView) {
     let name = form.get("name").unwrap_or("").trim().to_string();
     let email = form.get("email").unwrap_or("").trim().to_string();
 
@@ -63,7 +57,7 @@ pub(crate) fn submit(
         None
     };
 
-    let mut context = Subscribe::blank(&token, &styles);
+    let mut context = Subscribe::blank(&token);
     context.name = name;
     context.email = email;
     match problem {

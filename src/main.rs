@@ -6,7 +6,7 @@ mod users;
 
 use diesel::mysql::MysqlConnection;
 use diesel::Connection;
-use ignite_panel::{Ignite, PanelStyles};
+use ignite_panel::Ignite;
 use propel_rocket::PropelView;
 use propel_runtime::{Assets, RenderError};
 use serde::Serialize;
@@ -19,7 +19,13 @@ mod compiled {
 #[derive(Serialize)]
 pub(crate) struct Home {
     title: &'static str,
-    ignite_styles: String,
+}
+
+/// The app's assets: its own `public` directory, and the panel's build as the `ui`
+/// namespace. The panel's layout loads its stylesheet and script from `ui`, so every
+/// view that extends the layout is styled, with no step in the view itself.
+pub(crate) fn app_assets() -> Assets {
+    Assets::new("public").namespace("ui", ignite_panel::panel_source("/admin"))
 }
 
 /// Renders a page. A debug build uses the dev renderer, which reads the views on
@@ -31,7 +37,11 @@ where
     C: Serialize,
     F: FnOnce(&C, &Assets) -> Result<String, RenderError>,
 {
-    PropelView::render(name, context)
+    use propel_runtime::{render_with_assets, FileLoader};
+    // The app's views, and the panel's embedded views as `ignite`.
+    let loader =
+        FileLoader::new("resources/views").namespace_loader("ignite", ignite_panel::EmbeddedViews);
+    PropelView::from_result(render_with_assets(&loader, &app_assets(), name, context))
 }
 
 /// See the debug version. A release build renders the compiled view.
@@ -40,16 +50,15 @@ pub(crate) fn page<C, F>(_name: &str, context: &C, compiled: F) -> PropelView
 where
     F: FnOnce(&C, &Assets) -> Result<String, RenderError>,
 {
-    PropelView::from_result(compiled(context, &Assets::new("public")))
+    PropelView::from_result(compiled(context, &app_assets()))
 }
 
 #[get("/")]
-fn index(styles: PanelStyles) -> PropelView {
+fn index() -> PropelView {
     page(
         "home",
         &Home {
             title: "Ignite example",
-            ignite_styles: styles.html().to_string(),
         },
         compiled::home::render,
     )
