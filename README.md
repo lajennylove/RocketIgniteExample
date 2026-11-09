@@ -59,11 +59,11 @@ The app listens on `http://127.0.0.1:8000`. To use another port, set `ROCKET_POR
 2. Sign in with the email and password from the step above. The dashboard shows two cards: total users, and users created in the last seven days.
 3. Open **Users**. The list shows 20 rows per page. Type in the search box to match a name or an email. Click a column heading to sort, and click it again to reverse.
 4. Click **New Users** to create a user. A blank field, a bad email or a short password shows an error beside the field.
-5. Click **Edit** on a row to change a user. The password is required on edit too, because the stored hash is never shown: enter the new password, or the same one again.
+5. Click **Edit** on a row to change a user. The password is optional on edit: a blank field keeps the stored password, and a new one replaces it.
 6. Click **Delete** on a row, then confirm. This cannot be undone.
 7. Click **Sign out** to end the session.
 
 ## Known limits
 
-- A duplicate email on create or edit returns a server error, not a field message. The form checks the format of the email, not whether it is taken.
+- The form checks that an email has the form name@example.com. A duplicate email shows as a field error, "Email is already taken."
 - Diesel is pinned to a fork at `a07c4b2c` in `Cargo.toml`, with the libmariadb 3.4 fix. Remove that pin when a Diesel release contains the fix.

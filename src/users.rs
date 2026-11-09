@@ -32,13 +32,13 @@ const FIELDS: &[Field] = &[
         kind: FieldKind::Text,
         required: true,
     },
-    // Required on edit too: the form never shows the stored hash, so an edit
-    // sets a new password. See README.md.
+    // Required on create, optional on edit: a blank value keeps the stored hash.
+    // The create check lives in `validate`, not in this flag.
     Field {
         name: "password",
         label: "Password",
         kind: FieldKind::Password,
-        required: true,
+        required: false,
     },
 ];
 
@@ -89,6 +89,7 @@ impl IgniteResource for Users {
 
     const SLUG: &'static str = "users";
     const TITLE: &'static str = "Users";
+    const SINGULAR: &'static str = "User";
 
     fn latest_records() -> Option<LatestRecords> {
         Some(LatestRecords {
@@ -195,18 +196,25 @@ impl IgniteResource for Users {
     }
 
     fn update(conn: &mut MysqlConnection, id: i64, input: UserInput) -> QueryResult<UserRecord> {
-        let password_hash = ignite_panel::users::hash_password(&input.password).map_err(|e| {
-            diesel::result::Error::SerializationError(Box::new(std::io::Error::other(
-                e.to_string(),
-            )))
-        })?;
-        diesel::update(users::table.find(id))
-            .set((
-                users::name.eq(&input.name),
-                users::email.eq(&input.email),
-                users::password_hash.eq(password_hash),
-            ))
-            .execute(conn)?;
+        // A blank password keeps the stored hash.
+        if input.password.is_empty() {
+            diesel::update(users::table.find(id))
+                .set((users::name.eq(&input.name), users::email.eq(&input.email)))
+                .execute(conn)?;
+        } else {
+            let password_hash = ignite_core::hash_password(&input.password).map_err(|e| {
+                diesel::result::Error::SerializationError(Box::new(std::io::Error::other(
+                    e.to_string(),
+                )))
+            })?;
+            diesel::update(users::table.find(id))
+                .set((
+                    users::name.eq(&input.name),
+                    users::email.eq(&input.email),
+                    users::password_hash.eq(password_hash),
+                ))
+                .execute(conn)?;
+        }
         Self::find(conn, id)?.ok_or(diesel::result::Error::NotFound)
     }
 
@@ -215,35 +223,55 @@ impl IgniteResource for Users {
     }
 
     fn validate(form: &FormInput) -> Result<UserInput, FieldErrors> {
-        let mut errors = FieldErrors::new();
-        let name = FIELDS[0].check_required(form, &mut errors);
-        let email = FIELDS[1].check_required(form, &mut errors);
-        let password = FIELDS[2].check_required(form, &mut errors);
+        validate_form(form, true)
+    }
 
-        if let Some(email) = email {
-            if !email.contains('@') || email.starts_with('@') || email.ends_with('@') {
-                errors.insert(
-                    "email",
-                    "Email must look like name@example.com.".to_string(),
-                );
-            }
-        }
-        if let Some(password) = password {
-            if password.chars().count() < MIN_PASSWORD_CHARS {
-                errors.insert(
-                    "password",
-                    format!("Password must be at least {MIN_PASSWORD_CHARS} characters."),
-                );
-            }
-        }
+    fn validate_update(form: &FormInput) -> Result<UserInput, FieldErrors> {
+        validate_form(form, false)
+    }
+}
 
-        match (name, email, password) {
-            (Some(name), Some(email), Some(password)) if errors.is_empty() => Ok(UserInput {
+/// Checks the form. A password is required on create and optional on edit.
+fn validate_form(form: &FormInput, password_required: bool) -> Result<UserInput, FieldErrors> {
+    let mut errors = FieldErrors::new();
+    let name = FIELDS[0].check_required(form, &mut errors);
+    let email = FIELDS[1].check_required(form, &mut errors);
+    let password = if password_required {
+        FIELDS[2].check_required(form, &mut errors)
+    } else {
+        form.get("password")
+    };
+
+    if let Some(email) = email {
+        if !email.contains('@') || email.starts_with('@') || email.ends_with('@') {
+            errors.insert(
+                "email",
+                "Email must look like name@example.com.".to_string(),
+            );
+        }
+    }
+    if let Some(password) = password {
+        if password.chars().count() < MIN_PASSWORD_CHARS {
+            errors.insert(
+                "password",
+                format!("Password must be at least {MIN_PASSWORD_CHARS} characters."),
+            );
+        }
+    }
+
+    match (name, email, password) {
+        (Some(name), Some(email), Some(password)) if errors.is_empty() => Ok(UserInput {
+            name: name.to_string(),
+            email: email.to_string(),
+            password: password.to_string(),
+        }),
+        (Some(name), Some(email), None) if errors.is_empty() && !password_required => {
+            Ok(UserInput {
                 name: name.to_string(),
                 email: email.to_string(),
-                password: password.to_string(),
-            }),
-            _ => Err(errors),
+                password: String::new(),
+            })
         }
+        _ => Err(errors),
     }
 }
