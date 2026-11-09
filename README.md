@@ -49,6 +49,10 @@ cargo run
 
 The app listens on `http://127.0.0.1:8000`. To use another port, set `ROCKET_PORT`, for example `ROCKET_PORT=8123 cargo run`.
 
+## The app's own view
+
+`resources/views/home.propel` is the app's home page at `/`. It extends the panel's layout with `@extends('ignite::layouts.app')`, so it gets the panel's header and styles and fills the `title` and `content` sections. Copy it as the starting point for any page of your own.
+
 ## Walkthrough
 
 1. Open `http://127.0.0.1:8000/admin`. You are sent to the sign-in page.
