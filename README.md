@@ -19,13 +19,13 @@ You need Rust (stable), and MariaDB or MySQL. Debug and release builds both work
    ```
 
    - `DATABASE_URL` is `mysql://user:password@host:port/database`. Keep the password out of git; `.env` is ignored.
-   - `IGNITE_SECRET_KEY` signs the login session and the flash messages. Generate one with `openssl rand -base64 32`. Without it, a debug build makes a random key for each run, so every restart signs everyone out.
+   - `IGNITE_SECRET_KEY` signs the login session and the flash messages. Generate one with `openssl rand -base64 32`. Without it, a debug build makes a random key for each run, so every restart signs everyone out. A release build refuses to start without it.
 
 ## Migrations and seed data
 
-The panel owns the `users` table. Its migration runs when the app starts, so there is nothing to run by hand. The `ignite user create` command runs it too, so the table exists before the first admin is created.
+The panel owns the `users` table. The app runs the panel's migrations at startup: `src/main.rs` calls `ignite_panel::run_migrations` before Rocket launches, so there is nothing to run by hand. The `ignite user create` command runs them too, so the table exists before the first admin is created. The migration-at-boot line in `src/main.rs` is temporary and will be replaced by `ignite migrate` as a deploy step, run before the first start.
 
-To add the fake users in `seeds/users.sql` (five rows with fake names and emails, which cannot log in):
+To add the fake users in `seeds/users.sql` (five rows with fake names and emails, which cannot log in). Run it after the first start or after `ignite user create`, because the table must exist:
 
 ```sh
 mysql ignite_example < seeds/users.sql
@@ -60,14 +60,14 @@ The app listens on `http://127.0.0.1:8000`. To use another port, set `ROCKET_POR
 ## Walkthrough
 
 1. Open `http://127.0.0.1:8000/admin`. You are sent to the sign-in page.
-2. Sign in with the email and password from the step above. The dashboard shows two cards: total users, and users created in the last seven days.
+2. Sign in with the email and password from the step above. The dashboard shows two cards: **Total users**, and **New this week**, which counts the users created in the last seven days. The seven days are a rolling window measured on the database's clock, not a calendar week.
 3. Open **Users**. The list shows 20 rows per page. Type in the search box to match a name or an email. Click a column heading to sort, and click it again to reverse.
-4. Click **New Users** to create a user. A blank field, a bad email or a short password shows an error beside the field.
+4. Click **New User** to create a user. A blank field, a bad email or a short password shows an error beside the field.
 5. Click **Edit** on a row to change a user. The password is optional on edit: a blank field keeps the stored password, and a new one replaces it.
 6. Click **Delete** on a row, then confirm. This cannot be undone.
-7. Click **Sign out** to end the session.
+7. Click **Sign out** in the top bar. It ends every session of your account on every device, not only this one.
 
 ## Known limits
 
-- The form checks that an email has the form name@example.com. A duplicate email shows as a field error, "Email is already taken."
+- The email must contain an `@` that is neither its first nor its last character. Nothing else is checked, so `a@b` is accepted. The error reads "Email must look like name@example.com." A duplicate email shows as a field error, "Email is already taken."
 - Diesel is pinned to a fork at `a07c4b2c` in `Cargo.toml`, with the libmariadb 3.4 fix. Remove that pin when a Diesel release contains the fix.
