@@ -6,7 +6,7 @@ A Rocket app that mounts the [Ignite](https://github.com/lajennylove/Ignite) adm
 
 You need Rust (stable), and MariaDB or MySQL. Debug and release builds both work. A release build renders the views compiled by `build.rs`, and a debug build reads them at run time, so an edit shows on refresh.
 
-1. Create the database and a user that can reach it. With MariaDB installed locally, the socket login needs no password:
+1. Create the database and a user that can reach it. Replace `...` with a password of your choice, and put the same password in `DATABASE_URL` in step 2:
 
    ```sh
    mysql -e "CREATE DATABASE ignite_example CHARACTER SET utf8mb4; CREATE USER IF NOT EXISTS 'you'@'localhost' IDENTIFIED BY '...'; GRANT ALL PRIVILEGES ON ignite_example.* TO 'you'@'localhost';"
