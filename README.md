@@ -9,7 +9,7 @@ You need Rust (stable), and MariaDB or MySQL. Debug and release builds both work
 1. Create the database and a user that can reach it. With MariaDB installed locally, the socket login needs no password:
 
    ```sh
-   mysql -e "CREATE DATABASE ignite_example CHARACTER SET utf8mb4; GRANT ALL PRIVILEGES ON ignite_example.* TO 'you'@'localhost';"
+   mysql -e "CREATE DATABASE ignite_example CHARACTER SET utf8mb4; CREATE USER IF NOT EXISTS 'you'@'localhost' IDENTIFIED BY '...'; GRANT ALL PRIVILEGES ON ignite_example.* TO 'you'@'localhost';"
    ```
 
 2. Copy the environment template and edit it:
