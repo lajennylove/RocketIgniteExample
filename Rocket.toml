@@ -1,0 +1,4 @@
+[default]
+# Ignore the client-sent X-Real-IP header, so client_ip() is the socket address.
+# The panel itself never reads it; see the Deploying page of the Ignite docs.
+ip_header = false
