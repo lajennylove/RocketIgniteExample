@@ -23,7 +23,13 @@ You need Rust (stable), and MariaDB or MySQL. Debug and release builds both work
 
 ## Migrations and seed data
 
-The panel owns the `users` table. The app runs the panel's migrations at startup: `src/main.rs` calls `ignite_panel::run_migrations` before Rocket launches, so there is nothing to run by hand. The `ignite user create` command runs them too, so the table exists before the first admin is created. The migration-at-boot line in `src/main.rs` is temporary and will be replaced by `ignite migrate` as a deploy step, run before the first start.
+The panel owns the `users` table. Create the tables before the first start, and again after each deploy that adds a migration, with the panel's command:
+
+```sh
+cargo run --bin ignite -- migrate
+```
+
+`ignite migrate:status` lists the migrations as applied or pending. `ignite user create` does not create tables, so run `migrate` first. The app itself does not migrate at startup.
 
 To add the fake users in `seeds/users.sql` (five rows with fake names and emails, which cannot log in). Run it after the first start or after `ignite user create`, because the table must exist:
 
