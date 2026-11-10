@@ -62,7 +62,18 @@ pub(crate) fn rocket() -> rocket::Rocket<rocket::Build> {
     ignite_panel::run_migrations(&mut conn).expect("could not run the panel's migrations");
 
     rocket::build()
-        .attach(Ignite::new().resource::<users::Users>().fairing())
+        .attach(
+            Ignite::new()
+                .resource::<users::Users>()
+                // An app's own profile field: every user can set it on their profile.
+                .profile_field(ignite_core::Field {
+                    name: "job_title",
+                    label: "Job title",
+                    kind: ignite_core::FieldKind::Text,
+                    required: false,
+                })
+                .fairing(),
+        )
         .mount("/", routes![index, subscribe::form, subscribe::submit])
 }
 

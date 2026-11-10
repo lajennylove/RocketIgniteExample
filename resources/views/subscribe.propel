@@ -1,5 +1,11 @@
 @extends('ignite::layouts.app')
 
+@section('ignite_bar')
+  <header class="flex items-center border-b border-border bg-page px-5 py-3">
+    <a class="font-semibold text-heading no-underline" href="/">Ignite example</a>
+  </header>
+@endsection
+
 @section('title')
   {{ $title }}
 @endsection

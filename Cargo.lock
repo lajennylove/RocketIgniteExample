@@ -977,7 +977,7 @@ dependencies = [
 [[package]]
 name = "ignite-core"
 version = "0.0.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=d406c18a5686e4212b1df6f0f9e415236eea1e15#d406c18a5686e4212b1df6f0f9e415236eea1e15"
+source = "git+https://github.com/lajennylove/Ignite?rev=63f959b93242d9493fb54604d80db135eea7b715#63f959b93242d9493fb54604d80db135eea7b715"
 dependencies = [
  "argon2",
  "diesel",
@@ -989,7 +989,7 @@ dependencies = [
 [[package]]
 name = "ignite-macros"
 version = "0.0.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=d406c18a5686e4212b1df6f0f9e415236eea1e15#d406c18a5686e4212b1df6f0f9e415236eea1e15"
+source = "git+https://github.com/lajennylove/Ignite?rev=63f959b93242d9493fb54604d80db135eea7b715#63f959b93242d9493fb54604d80db135eea7b715"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -999,7 +999,7 @@ dependencies = [
 [[package]]
 name = "ignite-panel"
 version = "0.0.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=d406c18a5686e4212b1df6f0f9e415236eea1e15#d406c18a5686e4212b1df6f0f9e415236eea1e15"
+source = "git+https://github.com/lajennylove/Ignite?rev=63f959b93242d9493fb54604d80db135eea7b715#63f959b93242d9493fb54604d80db135eea7b715"
 dependencies = [
  "argon2",
  "base64",
