@@ -1,7 +1,8 @@
 //! The Users resource: the panel's list, form and actions for the `users` table.
 //!
-//! Written by hand rather than derived, because a password must be hashed
-//! before it is stored, and the derive cannot do that.
+//! Written by hand rather than derived. The derive hashes a password field, but
+//! this resource also needs an eight-character minimum and an email shape check
+//! in `validate`, so those rules are written here.
 
 use chrono::NaiveDateTime;
 use diesel::dsl::sql;
