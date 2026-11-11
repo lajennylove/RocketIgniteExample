@@ -6,11 +6,11 @@ publish = false
 default-run = "rocket-ignite-example"
 
 [dependencies]
-# Ignite and Orbit from git, at the revisions the Ignite workspace locks (Ignite main
-# 1088789 and Orbit e3b8668). Rocket and Propel come from crates.io, as Ignite resolves them.
-ignite-panel = { git = "https://github.com/lajennylove/Ignite", rev = "1088789e9f86a5c87ecb697327173423f51c2240" }
-ignite-core = { git = "https://github.com/lajennylove/Ignite", rev = "1088789e9f86a5c87ecb697327173423f51c2240" }
-orbit-orm = { git = "https://github.com/lajennylove/Orbit", rev = "e3b8668270cc8c3f2c17b69b9257c442707be1a4" }
+# Ignite from git, at the revision the Ignite main branch is on (d3d1975). Orbit, Rocket and
+# Propel come from crates.io, as Ignite resolves them.
+ignite-panel = { git = "https://github.com/lajennylove/Ignite", rev = "d3d1975ae107b4e7e7dce92a20f1c83a73428866" }
+ignite-core = { git = "https://github.com/lajennylove/Ignite", rev = "d3d1975ae107b4e7e7dce92a20f1c83a73428866" }
+orbit-orm = "0.1.0"
 rocket = "0.5.2"
 propel_rocket = "0.2.0"
 propel_runtime = "0.2.0"
