@@ -5,16 +5,11 @@
 //! in `validate`, so those rules are written here.
 
 use chrono::NaiveDateTime;
-use diesel::dsl::sql;
-use diesel::mysql::MysqlConnection;
-use diesel::prelude::*;
-use diesel::result::QueryResult;
-use diesel::sql_types::Bool;
 use ignite_core::{
     escape_like, Column, Direction, Field, FieldErrors, FieldKind, FormInput, IgniteResource,
     LatestRecords, ListQuery, Page, StatWidget,
 };
-use ignite_panel::users::users;
+use orbit_orm::{Database, Direction as OrbitDirection, Error, Model, Operator, OrbitModel, Query};
 use serde::Serialize;
 
 /// The shortest password the form accepts. Matches the Ignite CLI.
@@ -67,12 +62,15 @@ const COLUMNS: &[Column] = &[
 /// The Users resource. Mounted at `/admin/users`.
 pub struct Users;
 
-/// One row of the list and the edit page. The password hash is never selected.
-#[derive(Debug, Queryable, Selectable, Serialize)]
-#[diesel(table_name = users)]
+/// One row of the list and the edit page. The password hash is not a field here, so
+/// it is never selected. The panel's `update_password` writes it.
+#[derive(Debug, OrbitModel, Serialize)]
+#[orbit(table = "users")]
 pub struct UserRecord {
     pub id: i64,
+    #[orbit(fillable)]
     pub name: String,
+    #[orbit(fillable)]
     pub email: String,
     pub created_at: NaiveDateTime,
 }
@@ -82,6 +80,14 @@ pub struct UserInput {
     name: String,
     email: String,
     password: String,
+}
+
+/// Narrows `query` to the rows whose name or email contains `pattern`.
+fn search(query: Query<UserRecord>, pattern: &str) -> Query<UserRecord> {
+    query.where_group(|q| {
+        q.where_op("name", Operator::Like, pattern)
+            .or_where_op("email", Operator::Like, pattern)
+    })
 }
 
 impl IgniteResource for Users {
@@ -100,21 +106,23 @@ impl IgniteResource for Users {
         })
     }
 
-    fn latest(conn: &mut MysqlConnection, limit: i64) -> QueryResult<Vec<UserRecord>> {
-        users::table
-            .order(users::id.desc())
-            .limit(limit)
-            .select(UserRecord::as_select())
-            .load(conn)
+    async fn latest(db: &Database, limit: i64) -> Result<Vec<UserRecord>, Error> {
+        UserRecord::query()
+            .order_by("id", OrbitDirection::Desc)
+            .limit(limit.max(0) as u64)
+            .get(db)
+            .await
     }
 
-    fn widgets(conn: &mut MysqlConnection) -> QueryResult<Vec<StatWidget>> {
-        let total: i64 = users::table.count().get_result(conn)?;
+    async fn widgets(db: &Database) -> Result<Vec<StatWidget>, Error> {
+        let total = UserRecord::query().count(db).await?;
         // Compared in the database's own clock, which is what created_at uses.
-        let this_week: i64 = users::table
-            .filter(sql::<Bool>("created_at >= NOW() - INTERVAL 7 DAY"))
-            .count()
-            .get_result(conn)?;
+        let this_week: i64 = orbit_orm::raw::fetch_scalar(
+            db,
+            "SELECT COUNT(*) FROM users WHERE created_at >= NOW() - INTERVAL 7 DAY",
+            &[],
+        )
+        .await?;
         Ok(vec![
             StatWidget {
                 label: "Total users",
@@ -135,59 +143,48 @@ impl IgniteResource for Users {
         COLUMNS
     }
 
-    fn list(conn: &mut MysqlConnection, query: &ListQuery) -> QueryResult<Page<UserRecord>> {
+    async fn list(db: &Database, query: &ListQuery) -> Result<Page<UserRecord>, Error> {
         let pattern = query
             .search
             .as_ref()
             .map(|s| format!("%{}%", escape_like(s)));
-        let mut rows = users::table.into_boxed();
-        let mut count = users::table.into_boxed();
+        let mut rows = UserRecord::query();
+        let mut count = UserRecord::query();
         if let Some(pattern) = &pattern {
-            rows = rows.filter(
-                users::name
-                    .like(pattern.clone())
-                    .or(users::email.like(pattern.clone())),
-            );
-            count = count.filter(
-                users::name
-                    .like(pattern.clone())
-                    .or(users::email.like(pattern.clone())),
-            );
+            rows = search(rows, pattern);
+            count = search(count, pattern);
         }
 
         let desc = matches!(query.sort, Some((_, Direction::Desc)));
         let key = query.sort.as_ref().map(|(key, _)| key.as_str());
-        rows = match (key, desc) {
-            (Some("name"), false) => rows.order(users::name.asc()),
-            (Some("name"), true) => rows.order(users::name.desc()),
-            (Some("email"), false) => rows.order(users::email.asc()),
-            (Some("email"), true) => rows.order(users::email.desc()),
-            (Some("created_at"), false) => rows.order(users::created_at.asc()),
-            (Some("created_at"), true) => rows.order(users::created_at.desc()),
-            _ => rows.order(users::id.asc()),
+        let (column, direction) = match (key, desc) {
+            (Some("name"), false) => ("name", OrbitDirection::Asc),
+            (Some("name"), true) => ("name", OrbitDirection::Desc),
+            (Some("email"), false) => ("email", OrbitDirection::Asc),
+            (Some("email"), true) => ("email", OrbitDirection::Desc),
+            (Some("created_at"), false) => ("created_at", OrbitDirection::Asc),
+            (Some("created_at"), true) => ("created_at", OrbitDirection::Desc),
+            _ => ("id", OrbitDirection::Asc),
         };
+        rows = rows.order_by(column, direction);
 
-        let total: i64 = count.count().get_result(conn)?;
+        let total = count.count(db).await?;
         let rows = rows
-            .limit(query.per_page)
-            .offset(query.offset())
-            .select(UserRecord::as_select())
-            .load(conn)?;
+            .limit(query.per_page.max(0) as u64)
+            .offset(query.offset().max(0) as u64)
+            .get(db)
+            .await?;
         Ok(Page { rows, total })
     }
 
-    fn find(conn: &mut MysqlConnection, id: i64) -> QueryResult<Option<UserRecord>> {
-        users::table
-            .find(id)
-            .select(UserRecord::as_select())
-            .first(conn)
-            .optional()
+    async fn find(db: &Database, id: i64) -> Result<Option<UserRecord>, Error> {
+        UserRecord::query().find(db, id).await
     }
 
-    fn create(conn: &mut MysqlConnection, input: UserInput) -> QueryResult<UserRecord> {
+    async fn create(db: &Database, input: UserInput) -> Result<UserRecord, Error> {
         // The panel's create_user hashes the password with argon2.
-        let user =
-            ignite_panel::users::create_user(conn, &input.name, &input.email, &input.password)?;
+        let user = ignite_panel::users::create_user(db, &input.name, &input.email, &input.password)
+            .await?;
         Ok(UserRecord {
             id: user.id,
             name: user.name,
@@ -196,31 +193,33 @@ impl IgniteResource for Users {
         })
     }
 
-    fn update(conn: &mut MysqlConnection, id: i64, input: UserInput) -> QueryResult<UserRecord> {
-        // A blank password keeps the stored hash.
-        if input.password.is_empty() {
-            diesel::update(users::table.find(id))
-                .set((users::name.eq(&input.name), users::email.eq(&input.email)))
-                .execute(conn)?;
-        } else {
-            let password_hash = ignite_core::hash_password(&input.password).map_err(|e| {
-                diesel::result::Error::SerializationError(Box::new(std::io::Error::other(
-                    e.to_string(),
-                )))
-            })?;
-            diesel::update(users::table.find(id))
-                .set((
-                    users::name.eq(&input.name),
-                    users::email.eq(&input.email),
-                    users::password_hash.eq(password_hash),
-                ))
-                .execute(conn)?;
-        }
-        Self::find(conn, id)?.ok_or(diesel::result::Error::NotFound)
+    async fn update(db: &Database, id: i64, input: UserInput) -> Result<UserRecord, Error> {
+        // A blank password keeps the stored hash. The name, the email and the hash change
+        // in one transaction, so a failed hash leaves the row as it was.
+        db.transaction(async |tx| {
+            UserRecord::query()
+                .where_eq("id", id)
+                .update(
+                    &mut *tx,
+                    &[
+                        ("name", input.name.as_str().into()),
+                        ("email", input.email.as_str().into()),
+                    ],
+                )
+                .await?;
+            if !input.password.is_empty() {
+                ignite_panel::users::update_password(&mut *tx, id, &input.password).await?;
+            }
+            Ok::<(), Error>(())
+        })
+        .await?;
+        Self::find(db, id).await?.ok_or(Error::NotFound {
+            table: UserRecord::TABLE,
+        })
     }
 
-    fn delete(conn: &mut MysqlConnection, id: i64) -> QueryResult<usize> {
-        diesel::delete(users::table.find(id)).execute(conn)
+    async fn delete(db: &Database, id: i64) -> Result<u64, Error> {
+        UserRecord::query().where_eq("id", id).delete(db).await
     }
 
     fn validate(form: &FormInput) -> Result<UserInput, FieldErrors> {

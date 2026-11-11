@@ -76,4 +76,3 @@ The app listens on `http://127.0.0.1:8000`. To use another port, set `ROCKET_POR
 ## Known limits
 
 - The email must contain an `@` that is neither its first nor its last character. Nothing else is checked, so `a@b` is accepted. The error reads "Email must look like name@example.com." A duplicate email shows as a field error, "Email is already taken."
-- Diesel is pinned to a fork at `a07c4b2c` in `Cargo.toml`, with the libmariadb 3.4 fix. Remove that pin when a Diesel release contains the fix.
