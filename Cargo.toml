@@ -6,10 +6,9 @@ publish = false
 default-run = "rocket-ignite-example"
 
 [dependencies]
-# Ignite from git, at the revision the Ignite main branch is on (d3d1975). Orbit, Rocket and
-# Propel come from crates.io, as Ignite resolves them.
-ignite-panel = { git = "https://github.com/lajennylove/Ignite", rev = "d3d1975ae107b4e7e7dce92a20f1c83a73428866" }
-ignite-core = { git = "https://github.com/lajennylove/Ignite", rev = "d3d1975ae107b4e7e7dce92a20f1c83a73428866" }
+# Ignite, Orbit, Rocket and Propel all come from crates.io.
+ignite-panel = "0.3.0"
+ignite-core = "0.3.0"
 orbit-orm = "0.1.0"
 rocket = "0.5.2"
 propel_rocket = "0.2.0"

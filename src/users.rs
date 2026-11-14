@@ -245,7 +245,7 @@ fn validate_form(form: &FormInput, password_required: bool) -> Result<UserInput,
     if let Some(email) = email {
         if !email.contains('@') || email.starts_with('@') || email.ends_with('@') {
             errors.insert(
-                "email",
+                "email".to_string(),
                 "Email must look like name@example.com.".to_string(),
             );
         }
@@ -253,7 +253,7 @@ fn validate_form(form: &FormInput, password_required: bool) -> Result<UserInput,
     if let Some(password) = password {
         if password.chars().count() < MIN_PASSWORD_CHARS {
             errors.insert(
-                "password",
+                "password".to_string(),
                 format!("Password must be at least {MIN_PASSWORD_CHARS} characters."),
             );
         }

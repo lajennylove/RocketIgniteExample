@@ -1030,8 +1030,9 @@ dependencies = [
 
 [[package]]
 name = "ignite-core"
-version = "0.2.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=d3d1975ae107b4e7e7dce92a20f1c83a73428866#d3d1975ae107b4e7e7dce92a20f1c83a73428866"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3de6d1760444d7f38eb1c351592ca556804513351c809251582e00dd215f12e"
 dependencies = [
  "argon2",
  "chrono",
@@ -1039,12 +1040,14 @@ dependencies = [
  "orbit-orm",
  "rand_core 0.6.4",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
 name = "ignite-macros"
-version = "0.2.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=d3d1975ae107b4e7e7dce92a20f1c83a73428866#d3d1975ae107b4e7e7dce92a20f1c83a73428866"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "07d27bb56702e58f4813893b199cc4502fb87ca494cec081822216261fc40e98"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1053,8 +1056,9 @@ dependencies = [
 
 [[package]]
 name = "ignite-panel"
-version = "0.2.0"
-source = "git+https://github.com/lajennylove/Ignite?rev=d3d1975ae107b4e7e7dce92a20f1c83a73428866#d3d1975ae107b4e7e7dce92a20f1c83a73428866"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53ef1ec08feec96aa9a8e5ad5553e054ff979f8c325f7577500ff6f366144085"
 dependencies = [
  "argon2",
  "base64 0.22.1",
